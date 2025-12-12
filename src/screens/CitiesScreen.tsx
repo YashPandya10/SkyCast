@@ -1,14 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Text, FAB, Portal, Modal, Searchbar, List, Button, Snackbar } from 'react-native-paper';
 import CityListItem from '../components/CityListItem';
+import { COLORS } from '../utils/theme';
 import weatherService from '../services/weatherService';
 import storageService from '../services/storageService';
 import { StoredCity, City } from '../types/weather.types';
 
 const CitiesScreen: React.FC = () => {
   const [cities, setCities] = useState<StoredCity[]>([]);
+  const [lastCity, setLastCity] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<City[]>([]);
@@ -19,6 +22,8 @@ const CitiesScreen: React.FC = () => {
   const loadCities = async () => {
     const savedCities = await storageService.getSavedCities();
     setCities(savedCities);
+    const lc = await storageService.getLastCity();
+    setLastCity(lc);
   };
 
   const handleSearch = async (query: string) => {
@@ -69,6 +74,20 @@ const CitiesScreen: React.FC = () => {
     setSnackbarVisible(true);
   };
 
+  const navigation = useNavigation();
+
+  // navigate to Home when a city is selected so the user sees updated details
+  const handleCityPressNavigate = async (cityName: string) => {
+    await storageService.setLastCity(cityName);
+    setSnackbarMessage(`Switched to ${cityName}`);
+    setSnackbarVisible(true);
+    setLastCity(cityName);
+    // go to Home tab to show details
+    // navigation type is from react-navigation; keep generic
+    // @ts-ignore
+    navigation.navigate('Home');
+  };
+
   useEffect(() => {
     loadCities();
   }, []);
@@ -98,7 +117,8 @@ const CitiesScreen: React.FC = () => {
           renderItem={({ item }) => (
             <CityListItem
               city={item}
-              onPress={() => handleCityPress(item.name)}
+              isPrimary={item.name === lastCity}
+              onPress={() => handleCityPressNavigate(item.name)}
               onDelete={() => handleDeleteCity(item.name)}
             />
           )}
@@ -183,12 +203,12 @@ const CitiesScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#87CEFA',
+    backgroundColor: COLORS.background,
   },
   header: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: '#0077b6',
+    backgroundColor: COLORS.primary,
     elevation: 4,
   },
   headerTitle: {
@@ -240,7 +260,7 @@ const styles = StyleSheet.create({
     margin: 16,
     right: 0,
     bottom: 0,
-    backgroundColor: '#0077b6',
+    backgroundColor: COLORS.primary,
   },
   modal: {
     backgroundColor: 'white',
@@ -282,7 +302,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   snackbar: {
-    backgroundColor: '#0077b6',
+    backgroundColor: COLORS.primary,
   },
 });
 

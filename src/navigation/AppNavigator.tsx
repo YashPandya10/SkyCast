@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeScreen from '../screens/HomeScreen';
 import ForecastScreen from '../screens/ForecastScreen';
 import CitiesScreen from '../screens/CitiesScreen';
+import { COLORS } from '../utils/theme';
 
 const Tab = createBottomTabNavigator();
 
@@ -32,7 +33,7 @@ const AppNavigator: React.FC = () => {
           tabBarInactiveTintColor: '#b3d9ff',
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: '#0077b6',
+            backgroundColor: COLORS.primary,
             height: 60,
             paddingBottom: 8,
             paddingTop: 8,

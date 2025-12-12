@@ -1,12 +1,14 @@
 // src/screens/ForecastScreen.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { ActivityIndicator, Text } from 'react-native-paper';
+import { COLORS } from '../utils/theme';
 import ForecastItem from '../components/ForecastItem';
 import weatherService from '../services/weatherService';
 import storageService from '../services/storageService';
 import { ForecastData } from '../types/weather.types';
+import { useFocusEffect } from '@react-navigation/native';
 
 const ForecastScreen: React.FC = () => {
   const [forecast, setForecast] = useState<ForecastData | null>(null);
@@ -46,6 +48,13 @@ const ForecastScreen: React.FC = () => {
     };
     init();
   }, []);
+
+  // reload forecast when screen is focused to reflect last selected city
+  useFocusEffect(
+    useCallback(() => {
+      loadForecast();
+    }, [])
+  );
 
   if (loading) {
     return (
@@ -91,12 +100,12 @@ const ForecastScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#87CEFA',
+    backgroundColor: COLORS.background,
   },
   header: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: '#0077b6',
+    backgroundColor: COLORS.primary,
     elevation: 4,
   },
   headerTitle: {
@@ -126,7 +135,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#0077b6',
+    color: COLORS.primary,
   },
   errorText: {
     fontSize: 16,

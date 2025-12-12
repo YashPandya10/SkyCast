@@ -18,7 +18,8 @@ class WeatherService {
 
   async getWeatherByCity(cityName: string): Promise<WeatherData> {
     const cached = await storageService.getCachedWeather(cityName);
-    if (cached) {
+    // Prefer cached only if it includes timezoneOffset (ensures correct local time)
+    if (cached && typeof cached.timezoneOffset !== 'undefined') {
       return cached;
     }
 
@@ -39,6 +40,7 @@ class WeatherService {
       cityName: data.name,
       country: data.sys.country,
       timestamp: Date.now(),
+      timezoneOffset: data.timezone,
     };
 
     await storageService.cacheWeather(weather);
@@ -67,6 +69,7 @@ class WeatherService {
       cityName: data.name,
       country: data.sys.country,
       timestamp: Date.now(),
+      timezoneOffset: data.timezone,
     };
 
     await storageService.cacheWeather(weather);
@@ -109,6 +112,7 @@ class WeatherService {
       cityName: data.city.name,
       forecast: Array.from(forecastMap.values()).slice(0, 7),
       timestamp: Date.now(),
+      timezoneOffset: data.city.timezone,
     };
 
     await storageService.cacheForecast(forecast);

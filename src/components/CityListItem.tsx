@@ -3,24 +3,37 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
+import { COLORS } from '../utils/theme';
 import { StoredCity } from '../types/weather.types';
 
 interface CityListItemProps {
   city: StoredCity;
   onPress: () => void;
   onDelete: () => void;
+  isPrimary?: boolean;
 }
 
-const CityListItem: React.FC<CityListItemProps> = ({ city, onPress, onDelete }) => {
+const CityListItem: React.FC<CityListItemProps> = ({ city, onPress, onDelete, isPrimary }) => {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.container}>
+    <TouchableOpacity onPress={onPress} style={[styles.container, { backgroundColor: COLORS.surface }]} activeOpacity={0.85}>
       <View style={styles.textContainer}>
-        <Text style={styles.cityName}>{city.name}</Text>
+        <View style={styles.titleRow}>
+          <Text style={styles.cityName}>{city.name}</Text>
+          {isPrimary && <Text style={styles.primaryBadge}>★</Text>}
+          {isPrimary && <Text style={styles.primaryLabel}>Primary</Text>}
+        </View>
         <Text style={styles.country}>{city.country}</Text>
       </View>
-      <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-        <Text style={styles.deleteText}>Delete</Text>
-      </TouchableOpacity>
+      <View style={styles.deleteWrapper}>
+        <IconButton
+          icon="trash-can"
+          size={20}
+          iconColor="#ffffff"
+          style={styles.deleteButton}
+          onPress={onDelete}
+          accessibilityLabel={`Delete ${city.name}`}
+        />
+      </View>
     </TouchableOpacity>
   );
 };
@@ -30,7 +43,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: COLORS.surface,
     borderRadius: 10,
     padding: 16,
     marginHorizontal: 16,
@@ -44,6 +57,15 @@ const styles = StyleSheet.create({
   textContainer: {
     flex: 1,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  primaryBadge: {
+    marginLeft: 8,
+    color: '#ffd54f',
+    fontSize: 16,
+  },
   cityName: {
     fontSize: 18,
     fontWeight: '600',
@@ -54,16 +76,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
-  deleteButton: {
-    backgroundColor: '#ff4d4d',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
+  deleteWrapper: {
+    marginLeft: 12,
   },
-  deleteText: {
-    color: '#ffffff',
-    fontWeight: '600',
-    fontSize: 14,
+  deleteButton: {
+    backgroundColor: COLORS.danger,
+  },
+  primaryLabel: {
+    marginLeft: 8,
+    backgroundColor: COLORS.accent,
+    color: COLORS.textPrimary,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    fontSize: 12,
+    fontWeight: '700',
   },
 });
 

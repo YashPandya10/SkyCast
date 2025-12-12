@@ -1,13 +1,15 @@
 // src/screens/HomeScreen.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { ActivityIndicator, Text, Button, Snackbar, IconButton } from 'react-native-paper';
+import { COLORS } from '../utils/theme';
 import WeatherCard from '../components/WeatherCard';
 import weatherService from '../services/weatherService';
 import locationService from '../services/locationService';
 import storageService from '../services/storageService';
 import { WeatherData } from '../types/weather.types';
+import { useFocusEffect } from '@react-navigation/native';
 
 const HomeScreen: React.FC = () => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -16,6 +18,8 @@ const HomeScreen: React.FC = () => {
   const [tempUnit, setTempUnit] = useState('C');
   const [error, setError] = useState('');
   const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [suggestionVisible, setSuggestionVisible] = useState(false);
+  const [suggestionCity, setSuggestionCity] = useState<{ name: string; country: string } | null>(null);
 
   const loadWeather = async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -36,6 +40,14 @@ const HomeScreen: React.FC = () => {
       const data = await weatherService.getWeatherByCoords(location);
       setWeather(data);
       await storageService.setLastCity(data.cityName);
+
+      // if detected city is not in saved cities, suggest adding it
+      const saved = await storageService.getSavedCities();
+      const exists = saved.some(c => c.name === data.cityName);
+      if (!exists) {
+        setSuggestionCity({ name: data.cityName, country: data.country });
+        setSuggestionVisible(true);
+      }
     } else {
       setError('Unable to get location. Please enable location services or add a city manually.');
     }
@@ -64,6 +76,13 @@ const HomeScreen: React.FC = () => {
     };
     init();
   }, []);
+
+  // reload when the screen gains focus so selected city changes are reflected
+  useFocusEffect(
+    useCallback(() => {
+      loadWeather();
+    }, [])
+  );
 
   if (loading) {
     return (
@@ -115,9 +134,31 @@ const HomeScreen: React.FC = () => {
         visible={snackbarVisible}
         onDismiss={() => setSnackbarVisible(false)}
         duration={2000}
-        style={styles.snackbar}
+        style={[styles.snackbar, { backgroundColor: COLORS.primary }]}
       >
         Temperature unit changed to °{tempUnit}
+      </Snackbar>
+
+      <Snackbar
+        visible={suggestionVisible}
+        onDismiss={() => setSuggestionVisible(false)}
+        duration={6000}
+        action={{
+          label: 'Add & Set Primary',
+          onPress: async () => {
+            if (!suggestionCity) return;
+            await storageService.addCity({ name: suggestionCity.name, country: suggestionCity.country });
+            await storageService.setLastCity(suggestionCity.name);
+            setSnackbarVisible(true);
+            setSuggestionVisible(false);
+            setSuggestionCity(null);
+            setSnackbarVisible(true);
+            // show confirmation message
+          }
+        }}
+        style={[styles.suggestionSnackbar, { backgroundColor: COLORS.textPrimary }]}
+      >
+        Add {suggestionCity?.name} to saved cities?
       </Snackbar>
     </View>
   );
@@ -126,7 +167,7 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#87CEFA',
+    backgroundColor: COLORS.background,
   },
   header: {
     flexDirection: 'row',
@@ -134,7 +175,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: '#0077b6',
+    backgroundColor: COLORS.primary,
     elevation: 4,
   },
   headerTitle: {
@@ -155,7 +196,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: '#0077b6',
+    color: COLORS.primary,
   },
   errorText: {
     fontSize: 16,
@@ -170,7 +211,10 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   snackbar: {
-    backgroundColor: '#0077b6',
+    backgroundColor: COLORS.primary,
+  },
+  suggestionSnackbar: {
+    backgroundColor: COLORS.textPrimary,
   },
 });
 

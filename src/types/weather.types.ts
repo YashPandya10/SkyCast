@@ -13,6 +13,7 @@ export interface WeatherData {
   cityName: string;
   country: string;
   timestamp: number;
+  timezoneOffset?: number; // seconds offset from UTC
 }
 
 export interface ForecastDay {
@@ -29,6 +30,7 @@ export interface ForecastData {
   cityName: string;
   forecast: ForecastDay[];
   timestamp: number;
+  timezoneOffset?: number;
 }
 
 export interface City {
@@ -41,6 +43,7 @@ export interface City {
 export interface StoredCity {
   name: string;
   country: string;
+  primary?: boolean;
 }
 
 export interface LocationCoords {
