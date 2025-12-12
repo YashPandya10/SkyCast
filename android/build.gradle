@@ -19,3 +19,17 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// Configure Java release and Kotlin jvmTarget for all subprojects
+subprojects {
+    tasks.withType(JavaCompile).configureEach { jc ->
+        jc.sourceCompatibility = JavaVersion.VERSION_17
+        jc.targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
+    }
+}
