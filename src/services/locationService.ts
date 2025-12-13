@@ -1,4 +1,3 @@
-// src/services/locationService.ts
 
 import Geolocation from 'react-native-geolocation-service';
 import { PermissionsAndroid, Platform } from 'react-native';

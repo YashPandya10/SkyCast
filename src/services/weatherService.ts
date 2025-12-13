@@ -1,5 +1,3 @@
-// src/services/weatherService.ts
-
 import axios from 'axios';
 import { WEATHER_API_KEY, WEATHER_API_BASE_URL } from '../utils/constants';
 import { WeatherData, ForecastData, ForecastDay, City, LocationCoords } from '../types/weather.types';

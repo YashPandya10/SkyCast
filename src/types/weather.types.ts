@@ -1,5 +1,3 @@
-// src/types/weather.types.ts
-
 export interface WeatherData {
   temp: number;
   feelsLike: number;

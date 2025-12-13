@@ -1,5 +1,3 @@
-// src/navigation/AppNavigator.tsx
-
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -11,24 +9,26 @@ import { COLORS } from '../utils/theme';
 
 const Tab = createBottomTabNavigator();
 
+const getTabBarIcon = (route: any, focused: boolean, color: string, size: number) => {
+  let iconName: string;
+
+  if (route.name === 'Home') {
+    iconName = focused ? 'weather-partly-cloudy' : 'weather-cloudy';
+  } else if (route.name === 'Forecast') {
+    iconName = focused ? 'calendar-week' : 'calendar-blank';
+  } else {
+    iconName = focused ? 'city' : 'city-variant-outline';
+  }
+
+  return <Icon name={iconName} size={size} color={color} />;
+};
+
 const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName: string;
-
-            if (route.name === 'Home') {
-              iconName = focused ? 'weather-partly-cloudy' : 'weather-cloudy';
-            } else if (route.name === 'Forecast') {
-              iconName = focused ? 'calendar-week' : 'calendar-blank';
-            } else {
-              iconName = focused ? 'city' : 'city-variant-outline';
-            }
-
-            return <Icon name={iconName} size={size} color={color} />;
-          },
+          tabBarIcon: ({ focused, color, size }) => getTabBarIcon(route, focused, color, size),
           tabBarActiveTintColor: '#ffffff',
           tabBarInactiveTintColor: '#b3d9ff',
           headerShown: false,

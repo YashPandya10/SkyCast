@@ -1,5 +1,3 @@
-// src/utils/theme.ts
-
 export const COLORS = {
   primary: '#0f766e', // deep teal
   background: '#f1f6f4',

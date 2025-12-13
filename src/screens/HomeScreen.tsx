@@ -1,4 +1,3 @@
-// src/screens/HomeScreen.tsx
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';

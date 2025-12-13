@@ -1,5 +1,3 @@
-// src/components/CityListItem.tsx
-
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';

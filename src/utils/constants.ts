@@ -1,5 +1,3 @@
-// src/utils/constants.ts
-
 // Replace with your OpenWeatherMap API key
 export const WEATHER_API_KEY = '5d3704da50ef9cb3c8845925a7c55f1a';
 export const WEATHER_API_BASE_URL = 'https://api.openweathermap.org/data/2.5';
